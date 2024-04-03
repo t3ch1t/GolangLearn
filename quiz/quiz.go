@@ -14,8 +14,6 @@ func main() {
 	csvFilename := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
 	flag.Parse()
 
-	//var quizPath string = quizLocation()
-	//var quizFile *os.File = fetchQuizFile(quizPath)
 	var quizFile *os.File = fetchQuizFile(*csvFilename)
 	defer quizFile.Close()
 
@@ -25,20 +23,6 @@ func main() {
 	fmt.Println("You answered ", correct, " questions correctly and ", incorrect, " incorrectly")
 	fmt.Println("Your score is ", correct, "/", correct+incorrect)
 
-}
-
-func quizLocation() string {
-	var userPath string
-
-	workingDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Could not get working directory.", err)
-	}
-	fmt.Println("The current working directory is: ", workingDir)
-	fmt.Println("Please enter file path to quiz")
-	fmt.Scanln(&userPath)
-
-	return userPath
 }
 
 func fetchQuizFile(path string) *os.File {
@@ -65,11 +49,12 @@ func readFile(file *os.File) [][]string {
 }
 
 func giveQuiz(quiz [][]string) (int, int) {
-	var correct int = 0
-	var incorrect int = 0
+	var numCorrect int = 0
+	var numIncorrect int = 0
+	var correct bool
 
 	for i := range quiz {
-		var userIn int
+
 		var space string = " "
 		var record string = strings.Join(quiz[i], space)
 		problem, answer, found := strings.Cut(record, space)
@@ -77,22 +62,38 @@ func giveQuiz(quiz [][]string) (int, int) {
 		if err != nil {
 			log.Fatal("There is a problem converting to integer.", err)
 		}
-		if found != true {
+		if !found {
 			log.Fatal("This file is not formated correctly")
 		}
 
 		fmt.Println("Question", space, i+1)
 		fmt.Println(problem)
-		fmt.Scanln(&userIn)
 
-		if userIn == intAnswer {
-			correct++
-			fmt.Println("That is correct!")
-		} else if userIn != intAnswer {
-			incorrect++
+		correct = getAnswer(intAnswer)
+
+		if correct {
+			numCorrect++
+			fmt.Println("Correct Answer!")
+		} else if !correct {
+			numIncorrect++
 			fmt.Println("Incorrect Answer")
+			fmt.Printf("The correct answer is %d.\n", intAnswer)
 		}
 	}
 
-	return correct, incorrect
+	return numCorrect, numIncorrect
+}
+
+func getAnswer(answer int) bool {
+	var correct bool
+	var input int
+	fmt.Scanln(&input)
+
+	if input == answer {
+		correct = true
+	} else {
+		correct = false
+	}
+
+	return correct
 }
