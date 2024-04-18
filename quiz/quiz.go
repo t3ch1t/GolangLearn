@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"context"
 	"encoding/csv"
 	"flag"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	//"time"
 )
 
 func main() {
@@ -51,7 +53,7 @@ func readFile(file *os.File) [][]string {
 func giveQuiz(quiz [][]string) (int, int) {
 	var numCorrect int = 0
 	var numIncorrect int = 0
-	var correct bool
+	var isCorrect bool
 
 	for i := range quiz {
 
@@ -69,12 +71,13 @@ func giveQuiz(quiz [][]string) (int, int) {
 		fmt.Println("Question", space, i+1)
 		fmt.Println(problem)
 
-		correct = getAnswer(intAnswer)
+		getAnswer(intAnswer, &isCorrect)
+		//isCorrect = getAnswer(intAnswer)
 
-		if correct {
+		if isCorrect {
 			numCorrect++
 			fmt.Println("Correct Answer!")
-		} else if !correct {
+		} else if !isCorrect {
 			numIncorrect++
 			fmt.Println("Incorrect Answer")
 			fmt.Printf("The correct answer is %d.\n", intAnswer)
@@ -84,16 +87,16 @@ func giveQuiz(quiz [][]string) (int, int) {
 	return numCorrect, numIncorrect
 }
 
-func getAnswer(answer int) bool {
-	var correct bool
+func getAnswer(answer int, correct *bool) {
+
 	var input int
 	fmt.Scanln(&input)
 
 	if input == answer {
-		correct = true
+		*correct = true
 	} else {
-		correct = false
+		*correct = false
 	}
 
-	return correct
+	//return correct
 }
